@@ -1,12 +1,12 @@
 <template>
-    <v-container max-height="100%">
+    <v-container max-height="100%" class="px-7 mt-11" max-width="800">
         <div id="head">
             <div class="d-flex w-100 align-center">
                 <div class="d-flex align-center">
                     <div class="logo d-flex">
                         <img src="../assets/logo.svg" class="w-100" />
                     </div>
-                    <div class="text-h5 ms-2 font-weight-bold">Cogwise</div>
+                    <div class="text-h5 ms-2 font-weight-bold">Short.lnk</div>
                 </div>
                 <div class="ms-auto d-flex align-center">
                     <button class="header-btn ms-2 classic-card"></button>
@@ -16,11 +16,8 @@
             </div>
         </div>
         <div id="body" class="mt-5">
-            <v-row>
-                <v-col cols="8">
-                   <ShortLinkPanel />
-                </v-col>
-            </v-row>
+            <ShortLinkSettings />
+            <ShortLinkPanel />
         </div>
     </v-container>
 </template>
