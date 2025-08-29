@@ -1,0 +1,24 @@
+/**
+ * src/styles/settings.scss
+ *
+ * Configures SASS variables and Vuetify overwrites
+ */
+
+// Подключение SF Pro Web через ссылку (напр. с CDN)
+// Можно взять, например, с https://fonts.cdnfonts.com/css/sf-pro-display
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Outfit:wght@100..900&display=swap');
+
+// Устанавливаем SF Pro как основной шрифт везде
+*:not(i) {
+  font-family: "Outfit", 'Roboto', 'Arial', sans-serif !important;
+}
+
+main{
+    background-color: #e2e6ef;
+}
+
+// https://vuetifyjs.com/features/sass-variables/
+// Пример изменения переменной Vuetify через SASS (если потребуется)
+// @use 'vuetify/settings' with (
+//   $color-pack: false
+// );
