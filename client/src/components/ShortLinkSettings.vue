@@ -5,8 +5,17 @@
         </div>
     </div>
     <div class="d-flex align-center justify-center link-shortener-block">
-        <input class="inp-link" placeholder="https://very-long-link.ru/example">
-        <button class="short-link-btn ms-2">
+        <input 
+        class="inp-link" 
+        ref="url" 
+        v-model.trim="longUrl"
+        @keyup.enter="shortenLink"
+        placeholder="https://very-long-link.ru/example">
+        <button 
+        class="short-link-btn ms-2"
+        @click="shortenLink"
+        :disabled="shortening || !longUrl"
+        :aria-busy="shortening ? 'true' : 'false'">
             Сократить ссылку
         </button>
     </div>
@@ -21,7 +30,40 @@ export default {
             activeTab: "link",
             longUrl: "",
             shortUrl: "",
-            shortening: false
+            shortening: false,
+            error: ""
+        }
+    },
+
+    methods: {
+        async shortenLink() {
+            const url = this.longUrl?.trim() || this.$refs.url?.value?.trim() || "";
+
+            if (!url) {
+                this.error = "Пожалуйста, введите URL для сокращения.";
+                return;
+            }
+
+            this.error = "";
+            this.shortUrl = "";
+            this.shortening = true;
+
+            try {
+                const { data } = await this.$api.post('/create/short_link', { url });
+
+                console.log(data)
+
+                if (!data) {
+                    this.error = "Сервис вернул неожиданный ответ. Не удалось получить короткую ссылку.";
+                }
+            } catch (e) {
+                this.error =
+                    e?.response?.data?.message ||
+                    e?.message ||
+                    "Не удалось сократить ссылку. Попробуйте позже.";
+            } finally {
+                this.shortening = false;
+            }
         }
     }
 }

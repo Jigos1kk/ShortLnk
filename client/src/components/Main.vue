@@ -8,11 +8,11 @@
                     </div>
                     <div class="text-h5 ms-2 font-weight-bold">Short.lnk</div>
                 </div>
-                <div class="ms-auto d-flex align-center">
+                <!-- <div class="ms-auto d-flex align-center">
                     <button class="header-btn ms-2 classic-card"></button>
                     <button class="header-btn ms-2 classic-card"></button>
                     <button class="header-btn profile ms-4 classic-card"></button>
-                </div>
+                </div> -->
             </div>
         </div>
         <div id="body" class="mt-5">
@@ -24,8 +24,19 @@
 
 <script>
 export default {
-    name: "Main"
+    name: "Main",
+    mounted() {
+        // Пример запроса к API при монтировании
+        this.checkApi();
+    },
+    methods: {
+        async checkApi() {
+            console.log(await this.$api.get('/connect'));
+            
+        },
+    },
 }
+
 </script>
 
 <style>

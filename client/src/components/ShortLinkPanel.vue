@@ -14,7 +14,7 @@
                                 <v-icon icon="mdi-link" />
                                 <div class="font-weight-bold ms-2">{{ shortURL }}</div>
                             </a>
-                            <button class="ms-2 short-link-btn-panel square d-flex align-center justify-center">
+                            <button class="ms-4 short-link-btn-panel square d-flex align-center justify-center">
                                 <v-icon icon="mdi-content-copy" />
                             </button>
                         </div>
@@ -86,7 +86,7 @@
     }
 
     &:hover {
-        border: 1.25px solid #bfcae6;
+        border: 1.25px solid #a2aecd;
         transition: all 0.3s ease;
     }
 }
