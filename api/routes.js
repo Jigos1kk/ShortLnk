@@ -10,5 +10,6 @@ router.get('/connect', (req, res) => {
 });
 
 router.post('/create/short_link', ShortLinkController.create);
+router.get('/short_link', ShortLinkController.index);
 
 module.exports = router;

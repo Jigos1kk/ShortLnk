@@ -9,6 +9,11 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      qr_code: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+        comment: 'QR-код для данного сокращения (base64, SVG, PNG-URL и т.п.)',
+      },
       slug: {
         type: Sequelize.STRING(128),
         allowNull: false,

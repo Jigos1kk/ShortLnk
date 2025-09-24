@@ -23,7 +23,7 @@
 
 <script>
 export default {
-    name: "ShortLinkSettings",
+    name: "ShortLinkCut",
 
     data() {
         return {

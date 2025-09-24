@@ -16,8 +16,8 @@
             </div>
         </div>
         <div id="body" class="mt-5">
-            <ShortLinkSettings />
-            <ShortLinkPanel />
+            <ShortLinkCut />
+            <ShortLinkList />
         </div>
     </v-container>
 </template>
@@ -26,7 +26,6 @@
 export default {
     name: "Main",
     mounted() {
-        // Пример запроса к API при монтировании
         this.checkApi();
     },
     methods: {

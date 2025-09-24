@@ -14,7 +14,9 @@ declare module 'vue' {
     Main: typeof import('./src/components/Main.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    ShortLinkCut: typeof import('./src/components/ShortLinkCut.vue')['default']
+    ShortLinkList: typeof import('./src/components/ShortLinkList.vue')['default']
     ShortLinkPanel: typeof import('./src/components/ShortLinkPanel.vue')['default']
-    ShortLinkSettings: typeof import('./src/components/ShortLinkSettings.vue')['default']
+    ShortLinkSettings: typeof import('./src/components/ShortLinkCut.vue')['default']
   }
 }
