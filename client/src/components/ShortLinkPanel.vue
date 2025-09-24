@@ -72,17 +72,132 @@
         </v-container>
     </v-card>
 
-    <!-- <v-navigation-drawer v-model="rightDialog" location="right" width="40vw" temporary>
-        <v-card class="h-100" prepend-icon="mdi-update"
-            text="Your application will relaunch automatically after the update is complete." title="Update in progress"
-            style="height: 100%;">
-            <v-btn class="ms-auto" text="Ok" @click="rightDialog = false" />
+    <v-navigation-drawer v-model="rightDialog" location="right" temporary :width="600" elevation="0" :scrim="true">
+        <v-card class="h-100 d-flex flex-column" elevation="0">
+            <!-- Header with close button -->
+            <v-card-title class="d-flex align-center pa-4">
+                <span class="">Детали ссылки</span>
+                <v-chip class="ms-2" :color="data.is_active ? 'success' : 'error'" size="small">
+                    {{ data.is_active ? 'Активна' : 'Неактивна' }}
+                </v-chip>
+                <v-spacer />
+                <v-btn icon variant="text" size="small" @click="rightDialog = false">
+                    <v-icon>mdi-close</v-icon>
+                </v-btn>
+            </v-card-title>
+
+            <v-card-text class="flex-grow-1 pa-0">
+                <!-- Top section: QR Code + Name & Description -->
+                <div class="pa-4 py-0">
+                    <v-row no-gutters>
+                        <v-col cols="4" class="d-flex justify-center">
+                            <div class="text-center">
+                                <v-card class="" elevation="0" rounded="lg" width="190" height="190">
+                                    <v-img :src="data.qr_code" eager aspect-ratio="1" cover rounded="md" />
+                                </v-card>
+                            </div>
+                        </v-col>
+                        <v-col cols="8" class="ps-4 d-flex align-center">
+                            <div class="w-100">
+                                <div class="d-flex align-center mb-3 w-100">
+                                    <v-text-field label="Название" class="w-100" variant="outlined" hide-details :model-value="data.name"></v-text-field>
+                                </div>
+
+                                <div class="mb-2 w-100">
+                                    <v-textarea class="w-100" variant="outlined" rows="2" hide-details label="Описание" :model-value="data.description"/>
+                                </div>
+                            </div>
+                        </v-col>
+                    </v-row>
+                </div>
+
+                <!-- Links section -->
+                <div class="pa-4 py-0">
+                    <div class="mb-3">
+                        <div class="text-caption text-medium-emphasis mb-1">Короткая ссылка</div>
+                        <v-card variant="outlined" class="pa-3 d-flex align-center" rounded="lg">
+                            <v-icon color="primary" size="20" class="me-2">mdi-link-variant</v-icon>
+                            <a :href="`http://localhost:4000/redirect/${data.slug}`"
+                                class="text-primary text-decoration-none flex-grow-1" target="_blank">
+                                short.lnk/{{ data.slug }}
+                            </a>
+                            <v-btn icon size="small" variant="text"
+                                @click="copyToClipboard(`http://localhost:4000/redirect/${data.slug}`)">
+                                <v-icon size="16">mdi-content-copy</v-icon>
+                            </v-btn>
+                        </v-card>
+                    </div>
+
+                    <div>
+                        <div class="text-caption text-medium-emphasis mb-1">Оригинальная ссылка</div>
+                        <v-card variant="outlined" class="pa-3 d-flex align-center" rounded="lg">
+                            <v-icon color="grey" size="20" class="me-2">mdi-link</v-icon>
+                            <a :href="data.original_url"
+                                class="text-medium-emphasis text-decoration-none flex-grow-1 text-truncate"
+                                target="_blank" :title="data.original_url">
+                                {{ data.original_url }}
+                            </a>
+                            <v-btn icon size="small" variant="text" @click="copyToClipboard(data.original_url)">
+                                <v-icon size="16">mdi-content-copy</v-icon>
+                            </v-btn>
+                        </v-card>
+                    </div>
+                </div>
+
+                <!-- Statistics section -->
+                <div class="pa-4">
+                    <div class="text-subtitle-2 text-medium-emphasis mb-3">Статистика</div>
+
+                    <v-row>
+                        <v-col cols="6">
+                            <v-card variant="tonal" color="primary" class="pa-3 text-center" rounded="lg">
+                                <div class="text-h4 font-weight-bold text-primary">{{ data.click_count }}</div>
+                                <div class="text-caption text-medium-emphasis">Переходов</div>
+                            </v-card>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-card variant="tonal" color="secondary" class="pa-3 text-center" rounded="lg">
+                                <div class="text-h4 font-weight-bold text-secondary">
+                                    {{ data.max_clicks > 0 ? data.max_clicks : '∞' }}
+                                </div>
+                                <div class="text-caption text-medium-emphasis">Лимит</div>
+                            </v-card>
+                        </v-col>
+                    </v-row>
+
+                    <v-row class="mt-2">
+                        <v-col cols="6">
+                            <v-list-item class="pa-0">
+                                <template #prepend>
+                                    <v-icon color="info" size="20">mdi-clock-outline</v-icon>
+                                </template>
+                                <v-list-item-title class="text-body-2">Последний переход</v-list-item-title>
+                                <v-list-item-subtitle>
+                                    <span v-if="data.last_visit">
+                                        {{ formatDate(data.last_visit) }}
+                                    </span>
+                                    <span v-else class="text-medium-emphasis">—</span>
+                                </v-list-item-subtitle>
+                            </v-list-item>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-list-item class="pa-0">
+                                <template #prepend>
+                                    <v-icon color="success" size="20">mdi-check-circle</v-icon>
+                                </template>
+                                <v-list-item-title class="text-body-2">HTTP статус</v-list-item-title>
+                                <v-list-item-subtitle>{{ data.http_status }}</v-list-item-subtitle>
+                            </v-list-item>
+                        </v-col>
+                    </v-row>
+                </div>
+            </v-card-text>
         </v-card>
-    </v-navigation-drawer> -->
+    </v-navigation-drawer>
 </template>
 
 <style>
-.qr-code-actions{
+.qr-code-actions {
     top: 0;
     left: 0;
     z-index: 2;
@@ -101,82 +216,83 @@
 }
 
 .original-label {
-  font-size: 13px;
-  color: #666;
+    font-size: 13px;
+    color: #666;
 }
+
 .original-url {
-  font-size: 13px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-  display: block;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: block;
 }
 </style>
 
 <script>
-    export default {
-        name: "ShortLinkPanel",
+export default {
+    name: "ShortLinkPanel",
 
-        data() {
-            return {
-                qrHover: false,
-                rightDialog: false,
-            }
-        },
-        props: {
-            data: {
-                type: Object,
-                required: true
-            }
-        },
-        mounted() {
-            // console.log(this.qrHover);
-        },
-        methods: {
-            async copyQrCodeToClipboard() {
-                try {
-                    const base64 = this.data.qr_code;
-
-                    const res = await fetch(base64);
-                    const blob = await res.blob();
-                    await navigator.clipboard.write([
-                        new window.ClipboardItem({ [blob.type]: blob })
-                    ]);
-                    this.$emit('showSnackbar', 'QR-код скопирован в буфер обмена!');
-                } catch (e) {
-                    console.error(e);
-                    this.$emit('showSnackbar', 'Не удалось скопировать QR-код');
-                }
-            },
-            downloadQrCode() {
-                const base64 = this.data.qr_code;
-                const a = document.createElement('a');
-                a.href = base64;
-                a.download = `qr-code(${this.data.slug}).png`;
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                }, 100);
-            },
-
-            async copyShortLink() {
-                try {
-                    const link = `http://localhost:4000/redirect/${this.data.slug}`;
-                    await navigator.clipboard.writeText(link);
-                    this.$emit('showSnackbar', 'QR-код скопирован в буфер обмена!');
-                } catch (e) {
-                    console.error(e);
-                    this.$emit('showSnackbar', 'Не удалось скопировать QR-код');
-                }
-            },
+    data() {
+        return {
+            qrHover: false,
+            rightDialog: false,
         }
+    },
+    props: {
+        data: {
+            type: Object,
+            required: true
+        }
+    },
+    mounted() {
+        // console.log(this.qrHover);
+    },
+    methods: {
+        async copyQrCodeToClipboard() {
+            try {
+                const base64 = this.data.qr_code;
+
+                const res = await fetch(base64);
+                const blob = await res.blob();
+                await navigator.clipboard.write([
+                    new window.ClipboardItem({ [blob.type]: blob })
+                ]);
+                this.$emit('showSnackbar', 'QR-код скопирован в буфер обмена!');
+            } catch (e) {
+                console.error(e);
+                this.$emit('showSnackbar', 'Не удалось скопировать QR-код');
+            }
+        },
+        downloadQrCode() {
+            const base64 = this.data.qr_code;
+            const a = document.createElement('a');
+            a.href = base64;
+            a.download = `qr-code(${this.data.slug}).png`;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+            }, 100);
+        },
+
+        async copyShortLink() {
+            try {
+                const link = `http://localhost:4000/redirect/${this.data.slug}`;
+                await navigator.clipboard.writeText(link);
+                this.$emit('showSnackbar', 'QR-код скопирован в буфер обмена!');
+            } catch (e) {
+                console.error(e);
+                this.$emit('showSnackbar', 'Не удалось скопировать QR-код');
+            }
+        },
     }
+}
 </script>
 
 <style>
-.short-link{
+.short-link {
     font-size: 1.2rem;
     text-decoration: none;
     transition: all 0.3s ease;
@@ -201,11 +317,11 @@
     transition: all 0.3s ease;
 
     &.square {
-        width: 42px; 
-        aspect-ratio: 1 / 1 ;
+        width: 42px;
+        aspect-ratio: 1 / 1;
     }
 
-    &.short-link-btn-panel-text{
+    &.short-link-btn-panel-text {
         padding: 7px 28px;
         font-size: 18px;
     }
