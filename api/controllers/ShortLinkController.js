@@ -79,6 +79,16 @@ class ShortLinkController {
                 return res.status(403).json({ error: 'Превышен лимит переходов' });
             }
 
+            const now = new Date().toISOString().split('T')[0]
+            const expires_at = new Date(this.shortLink.expires_at).toISOString().split('T')[0]
+            if(expires_at > now){
+                return res.status(403).json({ error: 'Ссылка больше не актуальна' });
+            }
+
+            if(!shortLink.is_active){
+                return res.status(403).json({ error: 'Ссылка неактивна' });
+            }
+
             await ShortLinkModel.update(
                 { 
                     click_count: shortLink.click_count + 1,
