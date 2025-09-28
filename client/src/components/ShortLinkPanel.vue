@@ -72,128 +72,139 @@
         </v-container>
     </v-card>
 
-    <v-navigation-drawer v-model="rightDialog" location="right" temporary :width="600" elevation="0" :scrim="true">
-        <v-card class="h-100 d-flex flex-column" elevation="0">
-            <!-- Header with close button -->
-            <v-card-title class="d-flex align-center pa-4">
-                <span class="">Детали ссылки</span>
-                <v-chip class="ms-2" :color="data.is_active ? 'success' : 'error'" size="small">
-                    {{ data.is_active ? 'Активна' : 'Неактивна' }}
-                </v-chip>
-                <v-spacer />
-                <v-btn icon variant="text" size="small" @click="rightDialog = false">
-                    <v-icon>mdi-close</v-icon>
+    <v-navigation-drawer v-model="rightDialog" location="right" temporary color="transparent" :width="600" elevation="0"
+        :scrim="true" class="pa-2 border-0 h-100">
+        <v-card class="pa-2 h-100 rounded-lg overflow-auto d-flex flex-column" elevation="0">
+            <!-- Основной контент -->
+            <div class="flex-grow-1 overflow-auto">
+                <v-card class="pa-2 rounded-lg border mb-2" elevation="0">
+                    <div class="d-flex align-center px-3">
+                        <div class="">
+                            <div class="text-caption text-grey-darken-2">
+                                Название:
+                            </div>
+                            <input v-model="data.name" placeholder="Без названия" class="w-100 rounded text-body-2"
+                                style="outline: none;">
+                        </div>
+                        <div class="ms-auto mx-2">
+                            <div class="text-caption text-grey-darken-2">
+                                Код:
+                            </div>
+                            <div class="font-weight-bold">
+                                {{ data.slug }}
+                            </div>
+                        </div>
+                    </div>
+                </v-card>
+                <v-card class="pa-4 rounded-lg border" elevation="0">
+
+                    <v-sheet class="d-flex">
+                        <v-sheet color="grey-lighten-3"
+                            class="d-flex align-center rounded-xl relative border-md ms-auto">
+                            <!-- Активная панель -->
+                            <v-sheet class="rounded-xl text-center bg-white py-2"
+                                :class="data.is_active ? 'translate-x-100 bg-green-lighten-1' : 'translate-x-0 bg-red-lighten-1'"
+                                width="50%" style="
+                                    position: absolute;
+                                    height: 100%;
+                                    transition: all 0.3s ease;
+                                    cursor: pointer;
+                                "></v-sheet>
+
+                            <!-- Кнопки -->
+                            <v-sheet class="px-4 py-1 rounded-xl text-center" color="transparent" width="120"
+                                style="z-index: 2;" @click="data.is_active = false"
+                                :class="!data.is_active ? 'font-weight-medium  text-white' : 'text-grey-darken-2'">
+                                Неактивна
+                            </v-sheet>
+
+                            <v-sheet class="px-4 py-1 rounded-xl text-center" color="transparent" width="120"
+                                style="z-index: 2;" @click="data.is_active = true"
+                                :class="data.is_active ? 'font-weight-medium text-white' : 'text-grey-darken-2'">
+                                Активна
+                            </v-sheet>
+                        </v-sheet>
+                    </v-sheet>
+
+                    <div class="d-flex w-100 justify-center mb-3">
+                        <v-img :src="data.qr_code" height="210" class="rounded-lg" />
+                    </div>
+
+                    <v-sheet color="grey-lighten-4 mb-2" class="pa-2 px-4 rounded-lg w-100">
+                        <div>
+                            <span class="original-label">Оригинальный URL:</span>
+                            <div class="d-flex align-center">
+                                <div class="original-url me-2">{{ data.original_url }}</div>
+                                <button class="ms-auto bg-white px-2 py-1 rounded-lg text-caption"
+                                    @click="copy(data.original_url)">
+                                    Копировать
+                                </button>
+                            </div>
+                        </div>
+                    </v-sheet>
+
+                    <v-card class="rounded-lg pa-3 mb-3" color="grey-lighten-4" variant="flat">
+                        <span class="original-label">Описание:</span>
+                        <v-textarea v-model="data.description" placeholder="Добавьте описание..." variant="plain"
+                            hide-details auto-grow rows="3" density="compact"
+                            :class="{ 'text-grey': !data.description }" class="text-body-2"
+                            style="overflow-y: auto; max-height: 180px;"></v-textarea>
+                    </v-card>
+
+                    <div class="pa-2 border rounded-lg">
+                        <div class="d-flex align-center">
+                            <v-sheet width="45" height="45" rounded="lg" color="blue-darken-1">
+                                <div class="d-flex align-center justify-center w-100 h-100">
+                                    <v-icon icon="mdi-fingerprint" color="white" />
+                                </div>
+                            </v-sheet>
+                            <div class="px-2">
+                                <span class="original-label">Переходы:</span>
+                                <div style="font-size: 1.15rem;">
+                                    <span>{{ data.click_count }}</span>
+                                    <span class="text-grey-darken-2"> / {{ data.max_clicks || '∞' }}</span>
+                                    <v-chip class="ms-3 py-0" v-if="data.updatedAt">
+                                        <div class="text-caption font-weight-medium">
+                                            {{ data.updatedAt }}
+                                        </div>
+                                    </v-chip>
+                                </div>
+                            </div>
+                            <div class="ms-auto">
+                                <!-- Срок активности -->
+                                <div class="d-flex align-center justify-space-between">
+                                    <div>
+                                        <span class="text-caption text-grey-darken-1">Активна:</span>
+                                        <div class="text-caption font-weight-medium">
+                                            {{ data.expires_at ? formatDate(data.expires_at) : 'Бессрочно' }}
+                                        </div>
+                                    </div>
+
+                                    <!-- Кнопка изменения срока -->
+                                    <v-btn icon size="x-small" variant="text" @click="changeExpiryDate" class="ml-2">
+                                        <v-icon size="16">mdi-pencil</v-icon>
+                                    </v-btn>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </v-card>
+            </div>
+
+            <!-- Футер с кнопками -->
+            <v-card-actions class="pa-3 mt-auto bg-white">
+                <v-spacer></v-spacer>
+                <v-btn variant="outlined" color="grey-darken-2" @click="closeDialog" class="me-2">
+                    Закрыть
                 </v-btn>
-            </v-card-title>
-
-            <v-card-text class="flex-grow-1 pa-0">
-                <!-- Top section: QR Code + Name & Description -->
-                <div class="pa-4 py-0">
-                    <v-row no-gutters>
-                        <v-col cols="4" class="d-flex justify-center">
-                            <div class="text-center">
-                                <v-card class="" elevation="0" rounded="lg" width="190" height="190">
-                                    <v-img :src="data.qr_code" eager aspect-ratio="1" cover rounded="md" />
-                                </v-card>
-                            </div>
-                        </v-col>
-                        <v-col cols="8" class="ps-4 d-flex align-center">
-                            <div class="w-100">
-                                <div class="d-flex align-center mb-3 w-100">
-                                    <v-text-field label="Название" class="w-100" variant="outlined" hide-details :model-value="data.name"></v-text-field>
-                                </div>
-
-                                <div class="mb-2 w-100">
-                                    <v-textarea class="w-100" variant="outlined" rows="2" hide-details label="Описание" :model-value="data.description"/>
-                                </div>
-                            </div>
-                        </v-col>
-                    </v-row>
-                </div>
-
-                <!-- Links section -->
-                <div class="pa-4 py-0">
-                    <div class="mb-3">
-                        <div class="text-caption text-medium-emphasis mb-1">Короткая ссылка</div>
-                        <v-card variant="outlined" class="pa-3 d-flex align-center" rounded="lg">
-                            <v-icon color="primary" size="20" class="me-2">mdi-link-variant</v-icon>
-                            <a :href="`http://localhost:4000/redirect/${data.slug}`"
-                                class="text-primary text-decoration-none flex-grow-1" target="_blank">
-                                short.lnk/{{ data.slug }}
-                            </a>
-                            <v-btn icon size="small" variant="text"
-                                @click="copyToClipboard(`http://localhost:4000/redirect/${data.slug}`)">
-                                <v-icon size="16">mdi-content-copy</v-icon>
-                            </v-btn>
-                        </v-card>
-                    </div>
-
-                    <div>
-                        <div class="text-caption text-medium-emphasis mb-1">Оригинальная ссылка</div>
-                        <v-card variant="outlined" class="pa-3 d-flex align-center" rounded="lg">
-                            <v-icon color="grey" size="20" class="me-2">mdi-link</v-icon>
-                            <a :href="data.original_url"
-                                class="text-medium-emphasis text-decoration-none flex-grow-1 text-truncate"
-                                target="_blank" :title="data.original_url">
-                                {{ data.original_url }}
-                            </a>
-                            <v-btn icon size="small" variant="text" @click="copyToClipboard(data.original_url)">
-                                <v-icon size="16">mdi-content-copy</v-icon>
-                            </v-btn>
-                        </v-card>
-                    </div>
-                </div>
-
-                <!-- Statistics section -->
-                <div class="pa-4">
-                    <div class="text-subtitle-2 text-medium-emphasis mb-3">Статистика</div>
-
-                    <v-row>
-                        <v-col cols="6">
-                            <v-card variant="tonal" color="primary" class="pa-3 text-center" rounded="lg">
-                                <div class="text-h4 font-weight-bold text-primary">{{ data.click_count }}</div>
-                                <div class="text-caption text-medium-emphasis">Переходов</div>
-                            </v-card>
-                        </v-col>
-                        <v-col cols="6">
-                            <v-card variant="tonal" color="secondary" class="pa-3 text-center" rounded="lg">
-                                <div class="text-h4 font-weight-bold text-secondary">
-                                    {{ data.max_clicks > 0 ? data.max_clicks : '∞' }}
-                                </div>
-                                <div class="text-caption text-medium-emphasis">Лимит</div>
-                            </v-card>
-                        </v-col>
-                    </v-row>
-
-                    <v-row class="mt-2">
-                        <v-col cols="6">
-                            <v-list-item class="pa-0">
-                                <template #prepend>
-                                    <v-icon color="info" size="20">mdi-clock-outline</v-icon>
-                                </template>
-                                <v-list-item-title class="text-body-2">Последний переход</v-list-item-title>
-                                <v-list-item-subtitle>
-                                    <span v-if="data.last_visit">
-                                        {{ formatDate(data.last_visit) }}
-                                    </span>
-                                    <span v-else class="text-medium-emphasis">—</span>
-                                </v-list-item-subtitle>
-                            </v-list-item>
-                        </v-col>
-                        <v-col cols="6">
-                            <v-list-item class="pa-0">
-                                <template #prepend>
-                                    <v-icon color="success" size="20">mdi-check-circle</v-icon>
-                                </template>
-                                <v-list-item-title class="text-body-2">HTTP статус</v-list-item-title>
-                                <v-list-item-subtitle>{{ data.http_status }}</v-list-item-subtitle>
-                            </v-list-item>
-                        </v-col>
-                    </v-row>
-                </div>
-            </v-card-text>
+                <v-btn variant="flat" color="primary" @click="saveData">
+                    Сохранить
+                </v-btn>
+            </v-card-actions>
         </v-card>
     </v-navigation-drawer>
+
+
 </template>
 
 <style>
@@ -227,6 +238,18 @@
     text-overflow: ellipsis;
     max-width: 100%;
     display: block;
+}
+
+.translate-x-0 {
+    transform: translateX(0px);
+}
+
+.translate-x-100 {
+    transform: translateX(120px);
+}
+
+.relative {
+    position: relative;
 }
 </style>
 
@@ -264,6 +287,32 @@ export default {
                 console.error(e);
                 this.$emit('showSnackbar', 'Не удалось скопировать QR-код');
             }
+        },
+        getProgressColor(data) {
+            if (data.max_clicks === 0) return 'blue';
+            const percentage = (data.clicks_count / data.max_clicks) * 100;
+            if (percentage < 50) return 'green';
+            if (percentage < 80) return 'orange';
+            return 'red';
+        },
+
+        getExpirationStatus(expiresAt) {
+            if (!expiresAt) return 'Без ограничения по времени';
+            const now = new Date();
+            const expiration = new Date(expiresAt);
+            const diff = expiration - now;
+            const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+
+            if (days < 0) return 'Срок действия истек';
+            if (days === 0) return 'Истекает сегодня';
+            if (days === 1) return 'Истекает завтра';
+            if (days < 7) return `Истекает через ${days} дней`;
+            return `Истекает ${expiration.toLocaleDateString()}`;
+        },
+
+        copyUrl() {
+            // Логика копирования URL
+            navigator.clipboard.writeText(data.original_url);
         },
         downloadQrCode() {
             const base64 = this.data.qr_code;

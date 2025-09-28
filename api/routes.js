@@ -11,5 +11,6 @@ router.get('/connect', (req, res) => {
 
 router.post('/create/short_link', ShortLinkController.create);
 router.get('/short_link', ShortLinkController.index);
+router.get('/redirect/:slug', ShortLinkController.redirect);
 
 module.exports = router;
