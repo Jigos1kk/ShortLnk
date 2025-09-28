@@ -82,7 +82,7 @@ class ShortLinkController {
             await ShortLinkModel.update(
                 { 
                     click_count: shortLink.click_count + 1,
-                    last_accessed: new Date()
+                    last_accessed_at: new Date()
                 },
                 { where: { id: shortLink.id } }
             );
@@ -101,20 +101,13 @@ class ShortLinkController {
     }
 
     async update(req, res) {
-        const { id } = req.params;
+        const { slug } = req.params;
         const data = req.body;
 
         try {
-            const existingLink = await ShortLinkModel.findByPk(id);
+            const existingLink = await ShortLinkModel.findOne({ where: { slug } });
             if (!existingLink) {
                 return res.status(404).json({ error: 'Ссылка не найдена' });
-            }
-
-            let normalUrl;
-            try {
-                normalUrl = new URL(data.original_url).toString();
-            } catch(error) {
-                return res.status(400).json({ error: 'Неправильный URL' });
             }
 
             const updatedData = {
@@ -122,23 +115,11 @@ class ShortLinkController {
                 updated_at: new Date()
             };
 
-            if (existingLink.original_url !== normalUrl) {
-                const baseUrl = process.env.SHORT_LINK_DOMAIN || `${req.protocol}://${req.get('host')}`;
-                const shortUrl = `${baseUrl}/${existingLink.slug}`;
-                
-                try {
-                    updatedData.qr_code = await QRCode.toDataURL(shortUrl);
-                } catch(qrError) {
-                    console.error('Ошибка генерации QR:', qrError);
-                    return res.status(500).json({ error: 'Ошибка генерации QR-кода' });
-                }
-            }
-
             await ShortLinkModel.update(updatedData, {
-                where: { id }
+                where: { slug }
             });
 
-            const updatedLink = await ShortLinkModel.findByPk(id);
+            const updatedLink = await ShortLinkModel.findOne({ where: { slug } });
 
             this._broadcastUpdateShortLink(updatedLink);
 

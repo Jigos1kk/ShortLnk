@@ -10,6 +10,7 @@ router.get('/connect', (req, res) => {
 });
 
 router.post('/create/short_link', ShortLinkController.create);
+router.put('/update/short_link/:slug', ShortLinkController.update);
 router.get('/short_link', ShortLinkController.index);
 router.get('/redirect/:slug', ShortLinkController.redirect);
 

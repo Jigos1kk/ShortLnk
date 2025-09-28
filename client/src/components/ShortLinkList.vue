@@ -74,9 +74,13 @@ export default {
             const index = this.short_links.findIndex(link => link.id === updatedLink.id);
             
             if (index !== -1) {
-                this.$set(this.short_links, index, updatedLink);
+                this.short_links = [
+                    ...this.short_links.slice(0, index),
+                    updatedLink,
+                    ...this.short_links.slice(index + 1)
+                ];
             } else {
-                this.short_links.unshift(updatedLink);
+                this.short_links = [updatedLink, ...this.short_links];
             }
         },
 
