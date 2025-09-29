@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="./image/logo.png" style="width: 55px; height: 55px">
+    <img src="./image/logo.png" style="width: 85px; height: 85px">
     <div style="font-size: 24px; font-weight: bold"> Short.lnk </div>
 </div>
 
