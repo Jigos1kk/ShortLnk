@@ -1,7 +1,7 @@
-<div align="center">
-    <img src="./image/logo.png" style="width: 85px; height: 85px">
-    <div style="font-size: 24px; font-weight: bold"> Short.lnk </div>
-</div>
+
+<img src="./image/logo.png" style="width: 85px; height: 85px">
+<div style="font-size: 64px; font-weight: bold"> Short.lnk </div>
+
 
 Современный веб-сервис для сокращения длинных URL-адресов, построенный на Vue.js клиенте, Node.js(Express.js) API и PostgreSQL базе данных в Docker-окружении.
 
