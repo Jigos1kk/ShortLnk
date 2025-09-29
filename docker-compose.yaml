@@ -1,0 +1,74 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    container_name: db_short.lnk
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - shortlnk-network
+
+  api:
+    build: 
+      context: ./api
+      dockerfile: DockerFile
+    container_name: api_short.lnk
+    ports:
+      - "4000:4000"
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - PORT=${PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_HOST=postgres  
+    volumes:
+      - ./api:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - shortlnk-network
+
+  client:
+    build: 
+      context: ./client
+      dockerfile: DockerFile
+    container_name: client_short.lnk
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - VITE_API_BASE_URL=http://localhost:4000
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    depends_on:
+      - api
+    networks:
+      - shortlnk-network
+
+volumes:
+  pgdata:
+
+networks:
+  shortlnk-network:
+    driver: bridge

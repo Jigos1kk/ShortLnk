@@ -38,6 +38,14 @@
 - **Docker Compose** версии 2.0+
 - **Node.js** 23+
 
+## Запуск проекта
+
+```bash
+git clone https://github.com/Jigos1kk/ShortLnk.git
+cd ShortLnk
+docker compose up --build -d
+```
+
 ## 📸 Скриншоты
 
 ### Главная страница
